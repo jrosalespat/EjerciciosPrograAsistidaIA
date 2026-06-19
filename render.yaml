@@ -1,0 +1,28 @@
+services:
+  # Backend Service
+  - type: web
+    name: agenda-backend
+    env: node
+    rootDir: Proyecto1/BACKEND
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+  # Frontend Service
+  - type: site
+    name: agenda-frontend
+    env: static
+    rootDir: Proyecto1/FRONTEND
+    buildCommand: echo "No build needed"
+    publishDir: .
+    envVars:
+      - key: BACKEND_URL
+        sync: false
