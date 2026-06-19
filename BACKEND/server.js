@@ -207,6 +207,12 @@ app.post('/api/eventos', async (req, res) => {
       return res.status(400).json({ mensaje: 'Título y fecha son requeridos' });
     }
     
+    // Verificar conexión a Supabase
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Error: Variables de entorno de Supabase no configuradas');
+      return res.status(500).json({ mensaje: 'Error de configuración del servidor' });
+    }
+    
     const { data: evento, error } = await supabase
       .from('eventos')
       .insert([
@@ -217,13 +223,13 @@ app.post('/api/eventos', async (req, res) => {
 
     if (error) {
       console.error('Error al crear evento:', error);
-      return res.status(500).json({ mensaje: 'Error al crear evento' });
+      return res.status(500).json({ mensaje: 'Error al crear evento', error: error.message });
     }
     
     res.status(201).json(evento);
   } catch (error) {
     console.error('Error al crear evento:', error);
-    res.status(500).json({ mensaje: 'Error al crear evento' });
+    res.status(500).json({ mensaje: 'Error al crear evento', error: error.message });
   }
 });
 
