@@ -4,7 +4,7 @@ const isProduction = window.location.hostname !== 'localhost' && window.location
 // En producción, usar la URL del backend (debes configurarla manualmente)
 // En desarrollo, usar localhost
 const BACKEND_URL = isProduction 
-  ? 'https://tu-backend.onrender.com' // Reemplaza con tu URL real de Render
+  ? 'https://ejerciciosprograasistidaia-1.onrender.com'
   : 'http://localhost:3000';
 
 const API_URL = `${BACKEND_URL}/api/eventos`;
