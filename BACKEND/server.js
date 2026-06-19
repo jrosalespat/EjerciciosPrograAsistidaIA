@@ -201,7 +201,7 @@ app.get('/api/eventos/:id', async (req, res) => {
 // POST - Crear nuevo evento
 app.post('/api/eventos', async (req, res) => {
   try {
-    const { titulo, fecha, descripcion } = req.body;
+    const { titulo, fecha, descripcion, latitud, longitud } = req.body;
     
     if (!titulo || !fecha) {
       return res.status(400).json({ mensaje: 'Título y fecha son requeridos' });
@@ -216,7 +216,13 @@ app.post('/api/eventos', async (req, res) => {
     const { data: evento, error } = await supabase
       .from('eventos')
       .insert([
-        { titulo, fecha, descripcion: descripcion || '' }
+        { 
+          titulo, 
+          fecha, 
+          descripcion: descripcion || '',
+          latitud: latitud || null,
+          longitud: longitud || null
+        }
       ])
       .select()
       .single();

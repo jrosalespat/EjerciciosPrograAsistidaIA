@@ -148,6 +148,8 @@ async function handleAgregarEvento(e) {
   const titulo = document.getElementById('titulo').value;
   const fecha = document.getElementById('fecha').value;
   const descripcion = document.getElementById('descripcion').value;
+  const latitud = document.getElementById('latitud').value;
+  const longitud = document.getElementById('longitud').value;
   
   try {
     const response = await fetch(API_URL, {
@@ -155,7 +157,7 @@ async function handleAgregarEvento(e) {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ titulo, fecha, descripcion })
+      body: JSON.stringify({ titulo, fecha, descripcion, latitud, longitud })
     });
     
     if (response.ok) {
@@ -223,4 +225,85 @@ async function eliminarEvento(id) {
   } catch (error) {
     console.error('Error al eliminar evento:', error);
   }
+}
+
+// Variables para el mapa
+let map = null;
+let marker = null;
+
+// Event listener para el botón de obtener ubicación
+document.getElementById('obtenerUbicacion').addEventListener('click', obtenerUbicacion);
+
+// Función para obtener ubicación del navegador
+function obtenerUbicacion() {
+  const status = document.getElementById('ubicacionStatus');
+  const mapaDiv = document.getElementById('mapa');
+  
+  if (!navigator.geolocation) {
+    status.textContent = 'Tu navegador no soporta geolocalización';
+    return;
+  }
+  
+  status.textContent = 'Obteniendo tu ubicación...';
+  
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      
+      // Guardar coordenadas en campos ocultos
+      document.getElementById('latitud').value = lat;
+      document.getElementById('longitud').value = lng;
+      
+      status.textContent = `Ubicación obtenida: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      
+      // Mostrar mapa con marcador
+      mostrarMapa(lat, lng);
+    },
+    (error) => {
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          status.textContent = 'Permiso de ubicación denegado por el usuario';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          status.textContent = 'Información de ubicación no disponible';
+          break;
+        case error.TIMEOUT:
+          status.textContent = 'Tiempo de espera agotado';
+          break;
+        default:
+          status.textContent = 'Error al obtener ubicación';
+      }
+    }
+  );
+}
+
+// Función para mostrar el mapa con marcador
+function mostrarMapa(lat, lng) {
+  const mapaDiv = document.getElementById('mapa');
+  mapaDiv.style.display = 'block';
+  
+  // Si el mapa ya existe, actualizarlo
+  if (map) {
+    map.setView([lat, lng], 13);
+    if (marker) {
+      marker.setLatLng([lat, lng]);
+    } else {
+      marker = L.marker([lat, lng]).addTo(map);
+    }
+    return;
+  }
+  
+  // Crear nuevo mapa
+  map = L.map('mapa').setView([lat, lng], 13);
+  
+  // Agregar capa de OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  
+  // Agregar marcador
+  marker = L.marker([lat, lng]).addTo(map)
+    .bindPopup('Tu ubicación')
+    .openPopup();
 }
